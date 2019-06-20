@@ -129,7 +129,7 @@ def predict(model):
 
                     cnt = 0
                 else:
-                    personality.reading(eye.path_to_image(READ_PATH + "reading" + str(cnt) + ".png"))
+                    personality.reading(eye.path_to_image(READ_PATH + "reading_" + str(cnt) + ".PPM"))
             else:
                 cnt = 0
                 prev_label = preds[0]
