@@ -14,13 +14,12 @@ from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
 
-
 # set input resolution
 WIDTH = 64
 HEIGHT = 64
 landmark = ['bigben', 'china', 'nyc', 'eiffel', 'seattle']
-LAND_PATH = os.path.dirname(os.path.abspath(__file__))+"/landmark/"
-READ_PATH = os.path.dirname(os.path.abspath(__file__))+"/reading/"
+LAND_PATH = os.path.dirname(os.path.abspath(__file__)) + "/landmark/"
+READ_PATH = os.path.dirname(os.path.abspath(__file__)) + "/reading/"
 
 duration = 1
 if len(sys.argv) != 1:
@@ -89,7 +88,7 @@ def predict(model):
                 continue
             else:
                 cnt_none_crop = 0
-                
+
             x = Image.fromarray(crop_img)
             x = np.expand_dims(x, axis=0)
             preds = model.predict_classes(x)
@@ -98,17 +97,17 @@ def predict(model):
             if prev_label == preds[0]:
                 cnt += 1
                 if cnt > 2:
-                    print(eye.EYE_IMAGE_FOLDER_PATH+"sad1.ppm")
+                    print(eye.EYE_IMAGE_FOLDER_PATH + "sad1.ppm")
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
-                    if landmark[preds[0]] == 'china':
+                    if landmark[preds[0]] == 'eiffel':
                         zumi.turn_right(90)
-                    elif landmark[preds[0]] == 'bigben':
+                    elif landmark[preds[0]] == 'nyc':
                         zumi.turn_right(45)
                     elif landmark[preds[0]] == 'seattle':
                         zumi.turn_left(45)
-                    elif landmark[preds[0]] == 'nyc':
+                    elif landmark[preds[0]] == 'china':
                         zumi.turn_left(90)
 
                     time.sleep(.5)
@@ -119,42 +118,39 @@ def predict(model):
                     zumi.reverse(10, duration)
                     time.sleep(.5)
 
-                    if landmark[preds[0]] == 'china':
+                    if landmark[preds[0]] == 'eiffel':
                         zumi.turn_left(90)
-                    elif landmark[preds[0]] == 'bigben':
+                    elif landmark[preds[0]] == 'nyc':
                         zumi.turn_left(45)
                     elif landmark[preds[0]] == 'seattle':
                         zumi.turn_right(45)
-                    elif landmark[preds[0]] == 'nyc':
+                    elif landmark[preds[0]] == 'china':
                         zumi.turn_right(90)
 
                     cnt = 0
                 else:
                     personality.reading(eye.path_to_image(READ_PATH + "reading" + str(cnt) + ".png"))
-
             else:
                 cnt = 0
                 prev_label = preds[0]
 
-            print(cnt, prev_label, cnt_none_crop)
-                
     except KeyboardInterrupt:
         camera.shutdown()
         eye.draw_text("")
         zumi.stop()
         print("\nExiting...")
-    except :
+    except:
         camera.shutdown()
         eye.draw_text("")
         zumi.stop()
         print("\nExiting...")
 
 
-
 def run():
     print("init run method")
     start = time.process_time()
-    classification_model = generate_calssification_model(os.path.dirname(os.path.abspath(__file__))+"/weight_drawing.hdf5")
+    classification_model = generate_calssification_model(
+        os.path.dirname(os.path.abspath(__file__)) + "/weight_drawing.hdf5")
     print("model load : " + str(time.process_time() - start))
     predict(classification_model)
     # print(land + " :  finish")
