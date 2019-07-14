@@ -65,12 +65,24 @@ def predict(model):
     cnt = 0
     prev_label = -1
     cnt_none_crop = 0
+    zumi_sleep = True
+
     try:
         while True:
             zumi.reset_drive()
             img = camera.run()
             crop_img = c.crop(img)
-            if crop_img is None:
+            mpu_list = zumi.mpu.read_all_MPU_data()
+            x_acc = mpu_list[0]
+
+            tilt = zumi.get_tilt(mpu_list[0], mpu_list[1], mpu_list[2])
+
+            if tilt[0] == 5 and zumi_sleep:
+                if abs(x_acc) > 0.3:
+                    zumi_sleep = False
+
+            # classify
+            elif crop_img is None:
 
                 if cnt_none_crop == 0:
                     personality.look_around_open01()
@@ -98,37 +110,9 @@ def predict(model):
             if prev_label == preds[0]:
                 cnt += 1
                 if cnt > 2:
-                    print(eye.EYE_IMAGE_FOLDER_PATH + "sad1.ppm")
-                    print("reaction!!!!")
-                    eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
-                    time.sleep(2)
-                    if landmark[preds[0]] == 'eiffel':
-                        zumi.turn_right(90)
-                    elif landmark[preds[0]] == 'nyc':
-                        zumi.turn_right(45)
-                    elif landmark[preds[0]] == 'seattle':
-                        zumi.turn_left(45)
-                    elif landmark[preds[0]] == 'china':
-                        zumi.turn_left(90)
-
-                    time.sleep(.5)
-                    zumi.forward(10, duration)
-                    time.sleep(.5)
-                    personality.celebrate()
-                    time.sleep(.5)
-                    zumi.reverse(10, duration)
-                    time.sleep(.5)
-
-                    if landmark[preds[0]] == 'eiffel':
-                        zumi.turn_left(90)
-                    elif landmark[preds[0]] == 'nyc':
-                        zumi.turn_left(45)
-                    elif landmark[preds[0]] == 'seattle':
-                        zumi.turn_right(45)
-                    elif landmark[preds[0]] == 'china':
-                        zumi.turn_right(90)
-
+                    reaction(eye, personality, preds, zumi)
                     cnt = 0
+                    zumi_sleep = True
                 else:
                     personality.reading(eye.path_to_image(READ_PATH + "reading_" + str(cnt) + ".PPM"))
             else:
@@ -145,6 +129,36 @@ def predict(model):
         eye.draw_text("")
         zumi.stop()
         print("\nExiting...")
+
+
+def reaction(eye, personality, preds, zumi):
+    print(eye.EYE_IMAGE_FOLDER_PATH + "sad1.ppm")
+    print("reaction!!!!")
+    eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
+    time.sleep(2)
+    if landmark[preds[0]] == 'eiffel':
+        zumi.turn_right(90)
+    elif landmark[preds[0]] == 'nyc':
+        zumi.turn_right(45)
+    elif landmark[preds[0]] == 'seattle':
+        zumi.turn_left(45)
+    elif landmark[preds[0]] == 'china':
+        zumi.turn_left(90)
+    time.sleep(.5)
+    zumi.forward(10, duration)
+    time.sleep(.5)
+    personality.celebrate()
+    time.sleep(.5)
+    zumi.reverse(10, duration)
+    time.sleep(.5)
+    if landmark[preds[0]] == 'eiffel':
+        zumi.turn_left(90)
+    elif landmark[preds[0]] == 'nyc':
+        zumi.turn_left(45)
+    elif landmark[preds[0]] == 'seattle':
+        zumi.turn_right(45)
+    elif landmark[preds[0]] == 'china':
+        zumi.turn_right(90)
 
 
 def run():
