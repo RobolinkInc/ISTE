@@ -67,6 +67,7 @@ def predict(model):
     cnt_none_crop = 0
     try:
         while True:
+            zumi.reset_drive()
             img = camera.run()
             crop_img = c.crop(img)
             if crop_img is None:
