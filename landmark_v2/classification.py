@@ -9,7 +9,6 @@ import time
 from screen import Screen
 from personality import Personality, Sound
 from zumi.zumi import Zumi
-from driving
 from camera import Camera
 from crop import Crop
 from parking_with_counter import Drive
