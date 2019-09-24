@@ -102,7 +102,7 @@ def predict(model):
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
-                    drive = Drive(zumi)
+                    drive = Drive(Zumi())
                     if landmark[preds[0]] == 'eiffel':
                         drive.run_demo("a")
                     elif landmark[preds[0]] == 'nyc':
