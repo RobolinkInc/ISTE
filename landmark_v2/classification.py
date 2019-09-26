@@ -103,15 +103,15 @@ def predict(model):
                     time.sleep(2)
                     drive = Drive(Zumi())
                     if landmark[preds[0]] == 'eiffel':
-                        drive.run_demo("a")
+                        drive.run_demo("e")
                     elif landmark[preds[0]] == 'nyc':
                         drive.run_demo("d")
                     elif landmark[preds[0]] == 'seattle':
-                        drive.run_demo("i")
+                        drive.run_demo("b")
                     elif landmark[preds[0]] == 'china':
-                        drive.run_demo("c")
+                        drive.run_demo("i")
                     else:
-                        drive.run_demo("e") # london
+                        drive.run_demo("c") # london
 
                     personality.celebrate()
                     time.sleep(.5)
