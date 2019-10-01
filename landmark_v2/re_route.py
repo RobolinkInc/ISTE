@@ -1,5 +1,6 @@
 import networkx as nx
 import time
+from zumi.zumi import Zumi
 
 class Point:
     def __init__(self, x, y):
@@ -25,7 +26,7 @@ class Point:
 
 
 class Route:
-    def __init__(self):
+    def __init__(self, zumi = None):
         self.start_node = Point(0, 0)
         self.node1 = Point(10, 0)
         self.node2 = Point(20, 0)
@@ -60,7 +61,8 @@ class Route:
         self.SOUTH = 180
 
         self.heading = self.NORTH
-
+        if zumi is None:
+            self.zumi = Zumi()
         self.motor_speed = 10
         self.ir_threshold = 125
 
@@ -119,9 +121,12 @@ class Route:
         shortest_path = self.find_path(start, destination)[1:]
         current_node = start
         while len(shortest_path):
+            print(shortest_path)
             next_node = shortest_path.pop(0)
+            # found_obstacle = False
             found_obstacle = self.drive_to_nextnode(current_node,next_node)
             if found_obstacle:
+                print("find obstacle")
                 self.go_back_to_node(found_obstacle)
                 self.disconnect_route(current_node, next_node)
                 self.driving(current_node, destination)
@@ -161,7 +166,7 @@ class Route:
 
         while right_switch == n or left_switch == n:
 
-            ir_readings = self.z.get_all_IR_data()
+            ir_readings = self.zumi.get_all_IR_data()
 
             if ir_readings[3] < self.ir_threshold:
                 if not left_on_white:
@@ -183,37 +188,64 @@ class Route:
             if ir_readings[0] < 70 or ir_readings[5] < 70:
                 return max(right_switch, left_switch)
 
-            self.z.go_straight(self.motor_speed, self.heading)
+            self.zumi.go_straight(self.motor_speed, self.heading)
         return False
 
-    def adjust_driving(self, left_on_white, right_on_white, reverse = False):
+    def adjust_driving(self, left_on_white, right_on_white, reverse = 1):
         if right_on_white and not left_on_white:
             correction = -1
         elif left_on_white and not right_on_white:
             correction = 1
         else:
             return
-        self.heading += correction
+        self.heading += correction*reverse()
 
     def cross_intersection(self):
-
+        print("cross road")
         start = time.time()
         end = 0
         while end < 0.4:
             end = time.time()-start
-            self.z.go_straight(10, self.heading)
+            self.zumi.go_straight(10, self.heading)
 
-    def go_back_to_node(self, found_obstacle):
-        pass
+    def go_back_to_node(self, n):
+        left_on_white = False
+        right_on_white = False
+        right_switch = 0
+        left_switch = 0
+
+        while right_switch == n or left_switch == n:
+
+            ir_readings = self.zumi.get_all_IR_data()
+
+            if ir_readings[3] < self.ir_threshold:
+                if not left_on_white:
+                    left_switch += 1
+                    left_on_white = True
+            else:
+                left_on_white = False
+
+            if ir_readings[1] < self.ir_threshold:
+                if not right_on_white:
+                    right_switch += 1
+                    right_on_white = True
+            else:
+                right_on_white = False
+
+            self.adjust_driving(left_on_white, right_on_white, reverse=-1)
+            self.zumi.go_reverse(self.motor_speed, self.heading)
 
     def disconnect_route(self, current_node, next_node):
         self.G.add_edge(current_node, next_node, distance=1000)
 
 
 route = Route()
-route.find_path(route.start_node, route.node15)
-route.disconnect_route(route.node2, route.node1)
-route.find_path(route.node1, route.node15)
+route.driving(route.start_node, route.node15)
+# route.disconnect_route(route.node2, route.node1)
+# route.driving(route.node1, route.node15)
+# route.find_path(route.start_node, route.node15)
+# route.disconnect_route(route.node2, route.node1)
+# route.find_path(route.node1, route.node15)
 
 
 
