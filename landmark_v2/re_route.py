@@ -192,14 +192,14 @@ class Route:
             self.zumi.go_straight(self.motor_speed, self.heading)
         return False
 
-    def adjust_driving(self, left_on_white, right_on_white, reverse = 1):
+    def adjust_driving(self, left_on_white, right_on_white, reverse=1):
         if right_on_white and not left_on_white:
             correction = -1
         elif left_on_white and not right_on_white:
             correction = 1
         else:
             return
-        self.heading += correction*reverse()
+        self.heading += correction*reverse
 
     def cross_intersection(self):
         print("cross road")
