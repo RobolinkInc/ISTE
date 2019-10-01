@@ -138,7 +138,8 @@ class Route:
         dx = next.x - current.x
         dy = next.y - current.y
         self.decide_turn_or_pass_intersection(dx, dy, current)
-        return self.drive_n_block(abs(dx+dy))
+        result = self.drive_n_block(abs(dx+dy))
+        return result
 
     def decide_turn_or_pass_intersection(self, dx, dy, current):
         if dx > 0:
@@ -164,7 +165,7 @@ class Route:
         right_switch = 0
         left_switch = 0
 
-        while right_switch == n or left_switch == n:
+        while right_switch != n and left_switch != n:
 
             ir_readings = self.zumi.get_all_IR_data()
 
