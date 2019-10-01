@@ -1,5 +1,5 @@
 import networkx as nx
-
+import time
 
 class Point:
     def __init__(self, x, y):
@@ -53,6 +53,16 @@ class Route:
         self.node24 = Point(30, 30)
         self.G = nx.Graph()
         self.generate_map()
+
+        self.NORTH = 0
+        self.WEST = 90
+        self.EAST = -90
+        self.SOUTH = 180
+
+        self.heading = self.NORTH
+
+        self.motor_speed = 10
+        self.ir_threshold = 125
 
     def generate_map(self):
         # Directed Graph
@@ -110,19 +120,90 @@ class Route:
         current_node = start
         while len(shortest_path):
             next_node = shortest_path.pop(0)
-            found_obstacle = self.drive_to_nextnode()
+            found_obstacle = self.drive_to_nextnode(current_node,next_node)
             if found_obstacle:
-                self.go_back_to_node()
+                self.go_back_to_node(found_obstacle)
                 self.disconnect_route(current_node, next_node)
                 self.driving(current_node, destination)
                 return
+            current_node = next_node
         return
 
-    def drive_to_nextnode(self):
-        self.node1 = self.node1
+    def drive_to_nextnode(self, current, next):
+        dx = next.x - current.x
+        dy = next.y - current.y
+        self.decide_turn_or_pass_intersection(dx, dy, current)
+        return self.drive_n_block(abs(dx+dy))
+
+    def decide_turn_or_pass_intersection(self, dx, dy, current):
+        if dx > 0:
+            new_heading = self.EAST
+        elif dx < 0:
+            new_heading = self.WEST
+        elif dy > 0:
+            new_heading = self.NORTH
+        else:
+            new_heading = self.SOUTH
+        if new_heading - 20 < self.heading < new_heading + 20:
+            self.heading = new_heading
+            return
+        elif not current.x+current.y:
+            return
+        else:
+            return self.cross_intersection()
+
+    def drive_n_block(self, n):
+
+        left_on_white = False
+        right_on_white = False
+        right_switch = 0
+        left_switch = 0
+
+        while right_switch == n or left_switch == n:
+
+            ir_readings = self.z.get_all_IR_data()
+
+            if ir_readings[3] < self.ir_threshold:
+                if not left_on_white:
+                    left_switch += 1
+                    left_on_white = True
+            else:
+                left_on_white = False
+
+            if ir_readings[1] < self.ir_threshold:
+                if not right_on_white:
+                    right_switch += 1
+                    right_on_white = True
+            else:
+                right_on_white = False
+
+            self.adjust_driving(left_on_white, right_on_white)
+
+            # detect obstacle
+            if ir_readings[0] < 70 or ir_readings[5] < 70:
+                return max(right_switch, left_switch)
+
+            self.z.go_straight(self.motor_speed, self.heading)
         return False
 
-    def go_back_to_node(self):
+    def adjust_driving(self, left_on_white, right_on_white, reverse = False):
+        if right_on_white and not left_on_white:
+            correction = -1
+        elif left_on_white and not right_on_white:
+            correction = 1
+        else:
+            return
+        self.heading += correction
+
+    def cross_intersection(self):
+
+        start = time.time()
+        end = 0
+        while end < 0.4:
+            end = time.time()-start
+            self.z.go_straight(10, self.heading)
+
+    def go_back_to_node(self, found_obstacle):
         pass
 
     def disconnect_route(self, current_node, next_node):
@@ -131,7 +212,7 @@ class Route:
 
 route = Route()
 route.find_path(route.start_node, route.node15)
-route.disconnect_route(route.node1, route.node2)
+route.disconnect_route(route.node2, route.node1)
 route.find_path(route.node1, route.node15)
 
 
