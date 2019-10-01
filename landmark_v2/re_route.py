@@ -158,7 +158,7 @@ class Route:
             return self.cross_intersection()
 
     def drive_n_block(self, n):
-
+        print("drive n block")
         left_on_white = False
         right_on_white = False
         right_switch = 0
