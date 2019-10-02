@@ -40,7 +40,7 @@ class Route:
         self.node10 = Point(20, 10)
         self.node11 = Point(30, 10)
         self.node12 = Point(0, 20)
-        self.node13 = Point(20, 10)
+        self.node13 = Point(10, 20)
         self.paris = Point(15, 20)
         self.node15 = Point(20, 15)
         self.node16 = Point(20, 20)
@@ -145,6 +145,10 @@ class Route:
 
     def decide_turn_or_pass_intersection(self, dx, dy, current):
         print("check turn or not")
+        temp = current.x + current.y
+        if temp and temp%5==0 :
+            self.cross_intersection()
+
         if dx > 0:
             new_heading = self.EAST
         elif dx < 0:
@@ -158,11 +162,6 @@ class Route:
             print("change heading")
             self.heading = new_heading
 
-        if not current.x+current.y:
-            return
-        else:
-            return self.cross_intersection()
-
     def drive_n_block(self, n):
         print("drive n block")
         left_on_white = False
@@ -172,30 +171,6 @@ class Route:
 
         while right_switch != n and left_switch != n:
 
-            ir_readings = self.zumi.get_all_IR_data()
-
-            if ir_readings[3] < self.ir_threshold:
-                if not left_on_white:
-                    left_switch += 1
-                    left_on_white = True
-            else:
-                left_on_white = False
-
-            if ir_readings[1] < self.ir_threshold:
-                if not right_on_white:
-                    right_switch += 1
-                    right_on_white = True
-            else:
-                right_on_white = False
-
-            self.adjust_driving(left_on_white, right_on_white)
-
-            # detect obstacle
-            if ir_readings[0] < 70 or ir_readings[5] < 70:
-                return max(right_switch, left_switch)
-
-            self.zumi.go_straight(self.motor_speed, self.heading)
-        while right_on_white or left_on_white:
             ir_readings = self.zumi.get_all_IR_data()
 
             if ir_readings[3] < self.ir_threshold:
@@ -234,7 +209,7 @@ class Route:
         print("cross road")
         start = time.time()
         end = 0
-        while end < 0.4:
+        while end < 0.45:
             end = time.time()-start
             self.zumi.go_straight(10, self.heading)
 
@@ -244,7 +219,7 @@ class Route:
         right_switch = 0
         left_switch = 0
 
-        while right_switch == n or left_switch == n:
+        while right_switch != n or left_switch != n:
 
             ir_readings = self.zumi.get_all_IR_data()
 
@@ -264,20 +239,44 @@ class Route:
 
             self.adjust_driving(left_on_white, right_on_white, reverse=-1)
             self.zumi.go_reverse(self.motor_speed, self.heading)
+        while right_on_white or left_on_white:
+            ir_readings = self.zumi.get_all_IR_data()
+
+            if ir_readings[3] < self.ir_threshold:
+                if not left_on_white:
+                    left_switch += 1
+                    left_on_white = True
+            else:
+                left_on_white = False
+
+            if ir_readings[1] < self.ir_threshold:
+                if not right_on_white:
+                    right_switch += 1
+                    right_on_white = True
+            else:
+                right_on_white = False
+
+            self.adjust_driving(left_on_white, right_on_white)
+
+            # detect obstacle
+            if ir_readings[0] < 70 or ir_readings[5] < 70:
+                return max(right_switch, left_switch)
+
+            self.zumi.go_reverse(self.motor_speed, self.heading)
+        time.sleep(0.3)
 
     def disconnect_route(self, current_node, next_node):
         self.G.add_edge(current_node, next_node, distance=1000)
 
 
 route = Route()
-route.driving(route.start_node, route.NY)
-# route.disconnect_route(route.node2, route.node1)
-# route.driving(route.node1, route.node15)
-# route.find_path(route.start_node, route.node15)
-# route.disconnect_route(route.node2, route.node1)
-# route.find_path(route.node1, route.node15)
-#route.drive_n_block(10)
-#route.zumi.stop()
-route.cross_intersection()
-route.zumi.stop()
-
+try:
+    route.driving(route.start_node, route.NY)
+    # route.disconnect_route(route.node1, route.node7)
+    # route.driving(route.start_node, route.seattle)
+    # route.driving(route.start_node, route.paris)
+    # route.driving(route.start_node, route.china)
+    # route.driving(route.start_node, route.bigben)
+    # route.go_back_to_node(10)
+finally:
+    route.zumi.stop()
