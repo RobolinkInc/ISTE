@@ -157,8 +157,8 @@ class Route:
         if not new_heading - 20 < self.heading < new_heading + 20:
             print("change heading")
             self.heading = new_heading
-            return self.cross_intersection()
-        elif not current.x+current.y:
+
+        if not current.x+current.y:
             return
         else:
             return self.cross_intersection()
