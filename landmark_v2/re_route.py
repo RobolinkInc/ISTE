@@ -153,7 +153,7 @@ class Route:
         else:
             new_heading = self.SOUTH
 
-        if new_heading - 20 < self.heading < new_heading + 20:
+        if not new_heading - 20 < self.heading < new_heading + 20:
             print("change heading")
             self.heading = new_heading
             return
