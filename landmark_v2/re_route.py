@@ -132,6 +132,7 @@ class Route:
                 self.driving(current_node, destination)
                 return
             current_node = next_node
+        self.zumi.stop()
         return
 
     def drive_to_nextnode(self, current, next):
@@ -156,7 +157,7 @@ class Route:
         if not new_heading - 20 < self.heading < new_heading + 20:
             print("change heading")
             self.heading = new_heading
-            return
+            return self.cross_intersection()
         elif not current.x+current.y:
             return
         else:
@@ -245,12 +246,12 @@ class Route:
 
 
 route = Route()
-route.driving(route.start_node, route.node15)
+route.driving(route.start_node, route.NY)
 # route.disconnect_route(route.node2, route.node1)
 # route.driving(route.node1, route.node15)
 # route.find_path(route.start_node, route.node15)
 # route.disconnect_route(route.node2, route.node1)
 # route.find_path(route.node1, route.node15)
-
-
+#route.drive_n_block(10)
+#route.zumi.stop()
 
