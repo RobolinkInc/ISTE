@@ -137,11 +137,13 @@ class Route:
     def drive_to_nextnode(self, current, next):
         dx = next.x - current.x
         dy = next.y - current.y
+        print("[{},{}]".format(dx, dy))
         self.decide_turn_or_pass_intersection(dx, dy, current)
         result = self.drive_n_block(abs(dx+dy))
         return result
 
     def decide_turn_or_pass_intersection(self, dx, dy, current):
+        print("check turn or not")
         if dx > 0:
             new_heading = self.EAST
         elif dx < 0:
@@ -150,7 +152,9 @@ class Route:
             new_heading = self.NORTH
         else:
             new_heading = self.SOUTH
+
         if new_heading - 20 < self.heading < new_heading + 20:
+            print("change heading")
             self.heading = new_heading
             return
         elif not current.x+current.y:
