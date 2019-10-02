@@ -113,8 +113,12 @@ class Route:
         # 연결 안 된 노드가 있을 경우를 방지
         if nx.has_path(self.G, start_point, destination):
             path = nx.shortest_path(self.G, source=start_point, target=destination, weight='distance')
+        else:
+            print("No path!!")
+            return
+        if path is not None:
+            print(path)
 
-        print(path)
         return path
 
     def driving(self, start, destination):
@@ -126,7 +130,7 @@ class Route:
             # found_obstacle = False
             found_obstacle = self.drive_to_nextnode(current_node,next_node)
             if found_obstacle:
-                print("find obstacle")
+                print("find obstacle : {}".format(found_obstacle))
                 self.go_back_to_node(found_obstacle)
                 self.disconnect_route(current_node, next_node)
                 self.driving(current_node, destination)
@@ -146,7 +150,7 @@ class Route:
     def decide_turn_or_pass_intersection(self, dx, dy, current):
         print("check turn or not")
         temp = current.x + current.y
-        if temp and temp%5==0 :
+        if temp and temp % 10 == 0:
             self.cross_intersection()
 
         if dx > 0:
@@ -170,7 +174,7 @@ class Route:
         left_switch = 0
 
         while right_switch != n and left_switch != n:
-
+            print("{},{}".format(left_switch, right_switch))
             ir_readings = self.zumi.get_all_IR_data()
 
             if ir_readings[3] < self.ir_threshold:
@@ -219,8 +223,8 @@ class Route:
         right_switch = 0
         left_switch = 0
 
-        while right_switch != n or left_switch != n:
-
+        while right_switch != n and left_switch != n:
+            print( "{},{}".format(left_switch, right_switch))
             ir_readings = self.zumi.get_all_IR_data()
 
             if ir_readings[3] < self.ir_threshold:
@@ -239,38 +243,53 @@ class Route:
 
             self.adjust_driving(left_on_white, right_on_white, reverse=-1)
             self.zumi.go_reverse(self.motor_speed, self.heading)
-        while right_on_white or left_on_white:
-            ir_readings = self.zumi.get_all_IR_data()
-
-            if ir_readings[3] < self.ir_threshold:
-                if not left_on_white:
-                    left_switch += 1
-                    left_on_white = True
-            else:
-                left_on_white = False
-
-            if ir_readings[1] < self.ir_threshold:
-                if not right_on_white:
-                    right_switch += 1
-                    right_on_white = True
-            else:
-                right_on_white = False
-
-            self.adjust_driving(left_on_white, right_on_white)
-
-            # detect obstacle
-            if ir_readings[0] < 70 or ir_readings[5] < 70:
-                return max(right_switch, left_switch)
-
-            self.zumi.go_reverse(self.motor_speed, self.heading)
-        time.sleep(0.3)
+        # while right_on_white or left_on_white:
+        #     ir_readings = self.zumi.get_all_IR_data()
+        #
+        #     if ir_readings[3] < self.ir_threshold:
+        #         if not left_on_white:
+        #             left_switch += 1
+        #             left_on_white = True
+        #     else:
+        #         left_on_white = False
+        #
+        #     if ir_readings[1] < self.ir_threshold:
+        #         if not right_on_white:
+        #             right_switch += 1
+        #             right_on_white = True
+        #     else:
+        #         right_on_white = False
+        #
+        #     self.adjust_driving(left_on_white, right_on_white, reverse=-1)
+        #
+        #     # detect obstacle
+        #     if ir_readings[0] < 70 or ir_readings[5] < 70:
+        #         return max(right_switch, left_switch)
+        #
+        #     self.zumi.go_reverse(self.motor_speed, self.heading)
+        time.sleep(0.4)
+        print("done")
 
     def disconnect_route(self, current_node, next_node):
-        self.G.add_edge(current_node, next_node, distance=1000)
+        # self.G.add_edge(current_node, next_node, distance=1000)
+        self.G.remove_edge(current_node, next_node)
+
+    def reset_map(self):
+        self.G = nx.Graph()
+        self.generate_map()
 
 
 route = Route()
 try:
+    # route.find_path(route.start_node, route.china)
+    # route.disconnect_route(route.start_node, route.node5)
+    # route.find_path(route.start_node, route.china)
+    # route.disconnect_route(route.start_node, route.node1)
+    # route.find_path(route.start_node, route.china)
+    # route.reset_map()
+    # route.find_path(route.start_node, route.china)
+    # route.drive_n_block(10)
+    # route.go_back_to_node(10)
     route.driving(route.start_node, route.NY)
     # route.disconnect_route(route.node1, route.node7)
     # route.driving(route.start_node, route.seattle)
