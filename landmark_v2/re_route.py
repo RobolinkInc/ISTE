@@ -144,6 +144,9 @@ class Route:
         dy = next.y - current.y
         print("[{},{}]".format(dx, dy))
         self.decide_turn_or_pass_intersection(dx, dy, current)
+        # if max(abs(dx),abs(dy))%10:
+        #     result = self.drive_n_block(abs(dx + dy)+1)
+        # else:
         result = self.drive_n_block(abs(dx+dy))
         return result
 
@@ -279,23 +282,24 @@ class Route:
         self.generate_map()
 
 
-route = Route()
-try:
-    # route.find_path(route.start_node, route.china)
-    # route.disconnect_route(route.start_node, route.node5)
-    # route.find_path(route.start_node, route.china)
-    # route.disconnect_route(route.start_node, route.node1)
-    # route.find_path(route.start_node, route.china)
-    # route.reset_map()
-    # route.find_path(route.start_node, route.china)
-    # route.drive_n_block(10)
-    # route.go_back_to_node(10)
-    route.driving(route.start_node, route.NY)
-    # route.disconnect_route(route.node1, route.node7)
-    # route.driving(route.start_node, route.seattle)
-    # route.driving(route.start_node, route.paris)
-    # route.driving(route.start_node, route.china)
-    # route.driving(route.start_node, route.bigben)
-    # route.go_back_to_node(10)
-finally:
-    route.zumi.stop()
+if __name__ == '__main__':
+    route = Route()
+    try:
+        # route.find_path(route.start_node, route.china)
+        # route.disconnect_route(route.start_node, route.node5)
+        # route.find_path(route.start_node, route.china)
+        # route.disconnect_route(route.start_node, route.node1)
+        # route.find_path(route.start_node, route.china)
+        # route.reset_map()
+        # route.find_path(route.start_node, route.china)
+        # route.drive_n_block(10)
+        # route.go_back_to_node(10)
+        route.driving(route.start_node, route.NY)
+        # route.disconnect_route(route.node1, route.node7)
+        # route.driving(route.start_node, route.seattle)
+        # route.driving(route.start_node, route.paris)
+        # route.driving(route.start_node, route.china)
+        # route.driving(route.start_node, route.bigben)
+        # route.go_back_to_node(10)
+    finally:
+        route.zumi.stop()

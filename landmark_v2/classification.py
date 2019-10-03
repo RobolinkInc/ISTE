@@ -11,7 +11,7 @@ from personality import Personality, Sound
 from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
-from parking_with_counter import Drive
+from re_route import Route
 
 # set input resolution
 WIDTH = 64
@@ -101,18 +101,18 @@ def predict(model):
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
-                    drive = Drive(Zumi())
+                    route = Route(zumi)
                     if landmark[preds[0]] == 'eiffel':
-                        drive.run_demo("e")
+                        route.driving(route.start_node, route.paris)
                     elif landmark[preds[0]] == 'nyc':
-                        drive.run_demo("d")
+                        route.driving(route.start_node, route.NY)
                     elif landmark[preds[0]] == 'seattle':
-                        drive.run_demo("b")
+                        route.driving(route.start_node, route.seattle)
                     elif landmark[preds[0]] == 'china':
-                        drive.run_demo("i")
+                        route.driving(route.start_node, route.china)
                     else:
-                        drive.run_demo("c") # london
-
+                        route.driving(route.start_node, route.bigben)
+                    zumi.stop()
                     personality.celebrate()
                     time.sleep(.5)
 
