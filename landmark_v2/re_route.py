@@ -62,9 +62,11 @@ class Route:
 
         self.heading = self.NORTH
         if zumi is None:
+            # pass
             self.zumi = Zumi()
         self.motor_speed = 10
         self.ir_threshold = 125
+        self.reverse = False
 
     def generate_map(self):
         # Directed Graph
@@ -153,7 +155,9 @@ class Route:
     def decide_turn_or_pass_intersection(self, dx, dy, current):
         print("check turn or not")
         temp = current.x + current.y
-        if temp and temp % 10 == 0:
+        if self.reverse:
+            self.reverse = False
+        elif temp and temp % 10 == 0:
             self.cross_intersection()
 
         if dx > 0:
@@ -171,10 +175,29 @@ class Route:
 
     def drive_n_block(self, n):
         print("drive n block")
-        left_on_white = False
-        right_on_white = False
+        ir_readings = self.zumi.get_all_IR_data()
+        left_on_white = False if ir_readings[3] > self.ir_threshold else True
+        right_on_white = False if ir_readings[1] > self.ir_threshold else True
         right_switch = 0
         left_switch = 0
+        while left_on_white or right_on_white:
+            ir_readings = self.zumi.get_all_IR_data()
+            if ir_readings[3] < self.ir_threshold:
+                if not left_on_white:
+                    left_on_white = True
+            else:
+                left_on_white = False
+
+            if ir_readings[1] < self.ir_threshold:
+                if not right_on_white:
+                    right_on_white = True
+            else:
+                right_on_white = False
+
+            self.adjust_driving(left_on_white, right_on_white)
+            if ir_readings[0] < 70 or ir_readings[5] < 70:
+                return max(right_switch, left_switch)
+            self.zumi.go_straight(self.motor_speed, self.heading)
 
         while right_switch != n and left_switch != n:
             print("{},{}".format(left_switch, right_switch))
@@ -221,6 +244,7 @@ class Route:
             self.zumi.go_straight(10, self.heading)
 
     def go_back_to_node(self, n):
+        self.reverse = True
         left_on_white = False
         right_on_white = False
         right_switch = 0
@@ -271,6 +295,7 @@ class Route:
         #
         #     self.zumi.go_reverse(self.motor_speed, self.heading)
         time.sleep(0.4)
+
         print("done")
 
     def disconnect_route(self, current_node, next_node):
@@ -303,3 +328,4 @@ if __name__ == '__main__':
         # route.go_back_to_node(10)
     finally:
         route.zumi.stop()
+
