@@ -12,6 +12,7 @@ from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
 from re_route import Route
+from parking_with_counter import Drive
 
 # set input resolution
 WIDTH = 64
@@ -55,7 +56,7 @@ def generate_calssification_model(filen=weight_file):
     return model
 
 
-def predict(model):
+def predict(model,Reroute=False):
     c = Crop()
     eye = Screen()
     zumi = Zumi()
@@ -101,31 +102,36 @@ def predict(model):
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
-                    route = Route(zumi)
-                    if landmark[preds[0]] == 'eiffel':
-                        route.driving(route.start_node, route.paris)
-                    elif landmark[preds[0]] == 'nyc':
-                        route.driving(route.start_node, route.NY)
-                    elif landmark[preds[0]] == 'seattle':
-                        route.driving(route.start_node, route.seattle)
-                    elif landmark[preds[0]] == 'china':
-                        route.driving(route.start_node, route.china)
+                    if Reroute:
+                        route = Route(zumi)
+                        if landmark[preds[0]] == 'eiffel':
+                            route.driving(route.start_node, route.paris)
+                        elif landmark[preds[0]] == 'nyc':
+                            route.driving(route.start_node, route.NY)
+                        elif landmark[preds[0]] == 'seattle':
+                            route.driving(route.start_node, route.seattle)
+                        elif landmark[preds[0]] == 'china':
+                            route.driving(route.start_node, route.china)
+                        else:
+                            route.driving(route.start_node, route.bigben)
+                        zumi.stop()
+                        personality.celebrate()
+                        time.sleep(.5)
                     else:
-                        route.driving(route.start_node, route.bigben)
-                    zumi.stop()
-                    personality.celebrate()
-                    time.sleep(.5)
-
-                    # if landmark[preds[0]] == 'eiffel':
-                    #     zumi.turn_left(90)
-                    # elif landmark[preds[0]] == 'nyc':
-                    #     zumi.turn_left(45)
-                    # elif landmark[preds[0]] == 'seattle':
-                    #     zumi.turn_right(45)
-                    # elif landmark[preds[0]] == 'china':
-                    #     zumi.turn_right(90)
-                    # else:
-                    #     pass # london
+                        drive = Drive(Zumi())
+                        if landmark[preds[0]] == 'eiffel':
+                            drive.run_demo("e")
+                        elif landmark[preds[0]] == 'nyc':
+                            drive.run_demo("d")
+                        elif landmark[preds[0]] == 'seattle':
+                            drive.run_demo("i")
+                        elif landmark[preds[0]] == 'china':
+                            drive.run_demo("i")
+                        else:
+                            drive.run_demo("c")  # london
+                        zumi.stop()
+                        personality.celebrate()
+                        time.sleep(.5)
 
                     cnt = 0
                 else:
