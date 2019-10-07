@@ -1,11 +1,9 @@
 import numpy as np
-import cv2
 import os
 import sys
 from PIL import Image
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout, LeakyReLU
-from keras.preprocessing.image import img_to_array
 from keras import backend as K
 import time
 from screen import Screen
@@ -150,8 +148,7 @@ def predict(model):
 def run():
     print("init run method")
     start = time.process_time()
-    classification_model = generate_calssification_model(
-        os.path.dirname(os.path.abspath(__file__)) + "/weight_drawing.hdf5")
+    classification_model = generate_calssification_model(os.path.dirname(os.path.abspath(__file__)) + "/weight_drawing.hdf5")
     print("model load : " + str(time.process_time() - start))
     predict(classification_model)
     # print(land + " :  finish")
