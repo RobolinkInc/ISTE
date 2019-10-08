@@ -11,8 +11,7 @@ from personality import Personality, Sound
 from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
-from re_route import Route
-from parking_with_counter import Drive
+from re_route2 import Route_new
 
 # set input resolution
 WIDTH = 64
@@ -102,8 +101,9 @@ def predict(model,Reroute=False):
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
+                    route = Route_new()
                     if Reroute:
-                        route = Route(zumi)
+                        print("go with rerouting")
                         if landmark[preds[0]] == 'eiffel':
                             route.driving(route.start_node, route.paris)
                         elif landmark[preds[0]] == 'nyc':
@@ -118,17 +118,22 @@ def predict(model,Reroute=False):
                         personality.celebrate()
                         time.sleep(.5)
                     else:
-                        drive = Drive(Zumi())
+                        print("no reroute")
                         if landmark[preds[0]] == 'eiffel':
-                            drive.run_demo("e")
+                            route.driving_without_reroute(route.start_node, route.paris)
+                            route.park_right()
                         elif landmark[preds[0]] == 'nyc':
-                            drive.run_demo("d")
+                            route.driving_without_reroute(route.start_node, route.NY)
+                            route.park_right()
                         elif landmark[preds[0]] == 'seattle':
-                            drive.run_demo("i")
+                            route.driving_without_reroute(route.start_node, route.seattle)
+                            route.park_left()
                         elif landmark[preds[0]] == 'china':
-                            drive.run_demo("i")
+                            route.driving_without_reroute(route.start_node, route.china)
+                            route.park_left()
                         else:
-                            drive.run_demo("c")  # london
+                            route.driving_without_reroute(route.start_node, route.bigben)
+                            route.park_right()
                         zumi.stop()
                         personality.celebrate()
                         time.sleep(.5)
@@ -152,12 +157,12 @@ def predict(model,Reroute=False):
         print("\nExiting...")
 
 
-def run():
+def run(reroute=False):
     print("init run method")
     start = time.process_time()
     classification_model = generate_calssification_model(os.path.dirname(os.path.abspath(__file__)) + "/weight_drawing.hdf5")
     print("model load : " + str(time.process_time() - start))
-    predict(classification_model)
+    predict(classification_model, reroute)
     # print(land + " :  finish")
 
 
