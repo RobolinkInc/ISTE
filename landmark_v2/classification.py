@@ -124,16 +124,28 @@ def predict(model,Reroute=False):
                             route.park_right()
                         elif landmark[preds[0]] == 'nyc':
                             route.driving_without_reroute(route.start_node, route.NY)
-                            route.park_right()
+                            # for reroute
+                            route.park_left()
+                            # for reroute2
+                            # route.park_right()
                         elif landmark[preds[0]] == 'seattle':
                             route.driving_without_reroute(route.start_node, route.seattle)
-                            route.park_left()
+                            # for reroute
+                            route.park_right()
+                            # for reroute2
+                            # route.park_left()
                         elif landmark[preds[0]] == 'china':
                             route.driving_without_reroute(route.start_node, route.china)
-                            route.park_left()
+                            # for reroute
+                            route.park_right()
+                            # for reroute2
+                            # route.park_left()
                         else:
                             route.driving_without_reroute(route.start_node, route.bigben)
-                            route.park_right()
+                            # for reroute
+                            route.park_left()
+                            # for reroute2
+                            # route.park_right()
                         zumi.stop()
                         personality.celebrate()
                         time.sleep(.5)
