@@ -11,7 +11,7 @@ from personality import Personality, Sound
 from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
-from re_route2 import Route_new
+from re_route import Route
 
 # set input resolution
 WIDTH = 64
@@ -101,7 +101,7 @@ def predict(model,Reroute=False):
                     print("reaction!!!!")
                     eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
-                    route = Route_new()
+                    route = Route()
                     if Reroute:
                         print("go with rerouting")
                         if landmark[preds[0]] == 'eiffel':
