@@ -140,6 +140,17 @@ class Route:
         self.zumi.stop()
         return
 
+    def driving_without_reroute(self, start, destination):
+        shortest_path = self.find_path(start, destination)[1:]
+        current_node = start
+        while len(shortest_path):
+            print(shortest_path)
+            next_node = shortest_path.pop(0)
+            x = self.drive_to_nextnode(current_node,next_node)
+            current_node = next_node
+        self.zumi.stop()
+        return
+
     def drive_to_nextnode(self, current, next):
         dx = next.x - current.x
         dy = next.y - current.y
@@ -305,6 +316,20 @@ class Route:
         self.G = nx.Graph()
         self.generate_map()
 
+    def turn(self, angle=91, speed=30, step=4, direction=-1, delay=0.01):
+            direction = self.zumi.clamp(direction,-1,1)
+            init_ang_z = self.zumi.read_z_angle()
+            for i in range(0, angle, step):
+                self.zumi.go_straight(speed, init_ang_z+direction*i)
+                time.sleep(delay)
+
+    def park_left(self):
+        self.turn(direction=1)
+        self.zumi.forward(duration=0.5)
+
+    def park_right(self):
+        self.turn()
+        self.zumi.forward(duration=0.5)
 
 if __name__ == '__main__':
     route = Route()
