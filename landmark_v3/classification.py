@@ -1,20 +1,14 @@
-import numpy as np
-import os
-import sys
-
-from PIL import Image
-from keras.models import Sequential, model_from_json
-from keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout, LeakyReLU
-from keras import backend as K
-
 import time
+
+import numpy as np
+import os, sys
+from PIL import Image
+from keras.models import model_from_json, load_model
 from screen import Screen
 from personality import Personality, Sound
 from zumi.zumi import Zumi
-
 from camera import Camera
 from crop import Crop
-
 from re_route import Route
 
 # set input resolution
@@ -33,37 +27,22 @@ if K.image_data_format() == 'channels_first':
 else:
     input_shape = (WIDTH, HEIGHT, 3)
 
-weight_file = '/home/pi/ISTE/landmark/weight_drawing.hdf5'
+weight_file = os.path.dirname(os.path.abspath(__file__))+'/weight_drawing.hdf5'
 
 
 def generate_calssification_model(filen=weight_file):
-    model = Sequential()
-
-    model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(64, 64, 3)))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(Dropout(0.1))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.1))
-    model.add(Dense(5, activation='softmax'))
-
-    model_json = model.to_json()
-    with open("model.json", "w") as json_file:
-        json_file.write(model_json)
-
-    model.load_weights(filen)
+    json_file = open("model.json", "r")
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    loaded_model.load_weights(weight_file)
     # compile
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    loaded_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     print(filen)
-    return model
+    return loaded_model
 
 
-def predict(model,Reroute=False):
+def predict(model, Reroute=False):
     c = Crop()
     eye = Screen()
     zumi = Zumi()
