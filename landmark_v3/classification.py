@@ -4,6 +4,7 @@ import numpy as np
 import os, sys
 from PIL import Image
 from keras.models import model_from_json, load_model
+from keras import backend as K
 from screen import Screen
 from personality import Personality, Sound
 from zumi.zumi import Zumi
