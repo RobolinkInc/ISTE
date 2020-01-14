@@ -1,5 +1,5 @@
 import time
-
+start = time.time()
 import numpy as np
 import os, sys
 from PIL import Image
@@ -11,7 +11,7 @@ from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
 from re_route import Route
-
+print("library load : {}".format(time.time()-start))
 # set input resolution
 WIDTH = 64
 HEIGHT = 64
