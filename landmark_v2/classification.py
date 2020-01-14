@@ -1,3 +1,6 @@
+import time
+start = time.time()
+
 import numpy as np
 import os
 import sys
@@ -5,13 +8,13 @@ from PIL import Image
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout, LeakyReLU
 from keras import backend as K
-import time
 from screen import Screen
 from personality import Personality, Sound
 from zumi.zumi import Zumi
 from camera import Camera
 from crop import Crop
 from re_route import Route
+print("library load : {}".format(time.time()-start))
 
 # set input resolution
 WIDTH = 64
