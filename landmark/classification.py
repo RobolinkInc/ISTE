@@ -53,7 +53,7 @@ def generate_calssification_model(filen=weight_file):
     return model
 
 
-def predict(model):
+def predict(model,option=None):
     c = Crop()
     eye = Screen()
     zumi = Zumi()
@@ -98,7 +98,10 @@ def predict(model):
                 if cnt > 2:
                     print(eye.EYE_IMAGE_FOLDER_PATH + "sad1.ppm")
                     print("reaction!!!!")
-                    eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
+                    if option == "gess" and preds[0] == 3:
+                        eye.draw_image(eye.path_to_image(LAND_PATH + "burjkhalifa.jpg"))
+                    else:
+                        eye.draw_image(eye.path_to_image(LAND_PATH + landmark[preds[0]] + ".jpg"))
                     time.sleep(2)
                     if landmark[preds[0]] == 'eiffel':
                         zumi.turn_right(90)
@@ -145,12 +148,12 @@ def predict(model):
         print("\nExiting...")
 
 
-def run():
+def run(option=None):
     print("init run method")
     start = time.process_time()
     classification_model = generate_calssification_model(os.path.dirname(os.path.abspath(__file__)) + "/weight_drawing.hdf5")
     print("model load : " + str(time.process_time() - start))
-    predict(classification_model)
+    predict(classification_model, option)
     # print(land + " :  finish")
 
 
